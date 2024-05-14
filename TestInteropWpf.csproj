@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <None Update="ImmediateRendering.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

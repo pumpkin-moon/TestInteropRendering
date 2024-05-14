@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Interop;
 
 namespace TestInteropWpf
 {
@@ -12,10 +11,8 @@ namespace TestInteropWpf
         {
             InitializeComponent();
 
-            var helper = new WindowInteropHelper(this);
-            IntPtr hWnd = helper.EnsureHandle();
-
-            var control = new ImmediateControl(hWnd);
+            var control = new ImmediateControl();
+            // control.Width = 400;
             Root.Children.Add(control);
         }
     }

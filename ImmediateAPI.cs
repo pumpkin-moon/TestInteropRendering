@@ -6,6 +6,8 @@ public readonly partial struct ImmediateAPI : IDisposable
 {
     private readonly IntPtr handle;
 
+    public bool IsInitialized => handle != IntPtr.Zero;
+
     public ImmediateAPI(IntPtr hWnd)
     {
         handle = API.Init(hWnd);
@@ -14,6 +16,11 @@ public readonly partial struct ImmediateAPI : IDisposable
     public void Render()
     {
         API.Render(handle);
+    }
+
+    public void Resize(int width, int height)
+    {
+        API.Resize(handle, width, height);
     }
 
     public void Dispose()
@@ -31,5 +38,8 @@ public readonly partial struct ImmediateAPI : IDisposable
 
         [LibraryImport("ImmediateRendering.dll")]
         public static partial void Release(IntPtr handle);
+
+        [LibraryImport("ImmediateRendering.dll")]
+        public static partial void Resize(IntPtr handle, int width, int height);
     }
 }
