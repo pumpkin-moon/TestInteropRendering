@@ -12,7 +12,7 @@ namespace TestInteropWpf
             InitializeComponent();
 
             var control = new ImmediateControl();
-            // control.Width = 400;
+            control.Width = 600;
             Root.Children.Add(control);
         }
     }
