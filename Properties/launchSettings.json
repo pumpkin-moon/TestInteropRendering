@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TestInteropWpf": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

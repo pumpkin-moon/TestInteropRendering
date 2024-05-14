@@ -8,6 +8,10 @@ namespace TestInteropWpf
         public const int WS_VISIBLE = 0x10000000;
         public const int WS_CLIPCHILDREN = 0x02000000;
 
+        public const int WM_ACTIVATE = 0x0006;
+        public static readonly IntPtr WA_ACTIVE = new IntPtr(1);
+        public static readonly IntPtr WA_INACTIVE = new IntPtr(0);
+
         public record struct RectL(int Left, int Top, int Right, int Bottom);
 
         [DllImport("user32.dll")]
@@ -30,6 +34,9 @@ namespace TestInteropWpf
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hWnd, out RectL lpRect);
+
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         public enum Events
         {

@@ -19,6 +19,12 @@ public sealed class ImmediateControl : HwndHost
         }
 
         totalTime = args.RenderingTime;
+
+        Render();
+    }
+
+    private void Render()
+    {
         api.Render();
     }
 
