@@ -1,6 +1,6 @@
-﻿namespace TestInteropWpf.Data;
+﻿namespace TestInteropWpf;
 
-public record struct Color(byte A, byte R, byte G, byte B)
+public record struct Color(byte R, byte G, byte B, byte A = 0xFF)
 {
     public Color(uint color) : this(
         (byte)((color >> 0) & 0xFF),

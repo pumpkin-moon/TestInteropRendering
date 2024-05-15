@@ -1,72 +1,73 @@
-﻿using System.Diagnostics;
+﻿using System.Runtime.InteropServices;
 using System.Windows;
-using Gemini.Framework.Controls;
-using TestInteropWpf.Data;
+using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace TestInteropWpf;
 
-public sealed class ImmediateControl : HwndWrapper
+public sealed class ImmediateControl : HwndHost
 {
+    private readonly Color clearColor;
     private ImmediateAPI api;
 
     private TimeSpan totalTime;
     private TimeSpan deltaTime;
 
-    private readonly Stopwatch stopwatch = Stopwatch.StartNew();
+    public event Action<ImmediateAPI, float> Update;
 
-    public float DeltaTime => (float)deltaTime.TotalSeconds;
-
-    public event Action<float> Update;
-
-    protected override void Render(IntPtr windowHandle)
+    public ImmediateControl(Color clearColor)
     {
-        var newTime = stopwatch.Elapsed;
-        deltaTime = newTime - totalTime;
-        totalTime = newTime;
+        this.clearColor = clearColor;
+    }
 
-        if (!api.IsInitialized)
+    private void OnRender(object sender, EventArgs e)
+    {
+        var args = (RenderingEventArgs)e;
+        if (totalTime == args.RenderingTime)
         {
-            api = new(windowHandle);
+            return;
         }
 
-        Update?.Invoke(DeltaTime);
+        deltaTime = args.RenderingTime - totalTime;
+        totalTime = args.RenderingTime;
 
-        api.BeginFrame();
+        Render();
+    }
 
-        var rnd = Random.Shared;
+    private void Render()
+    {
+        api.BeginFrame(clearColor);
 
-        int width = (int)ActualWidth;
-        int height = (int)ActualHeight;
-
-        // for (int i = 0; i < 100_000; ++i)
-        // {
-        //     var circle = new Circle
-        //     {
-        //         X = rnd.NextSingle() * width,
-        //         Y = rnd.NextSingle() * height,
-        //         Radius = rnd.NextSingle() * 20 + 5,
-        //         Thickness = rnd.NextSingle() * 4 + 1,
-        //         Color = 0xFF000000 | (uint)rnd.Next(),
-        //     };
-        //
-        //     api.DrawCircle(circle);
-        // }
-        for (int i = 0; i < 400_000; ++i)
-        {
-            var line = new Line
-            {
-                X0 = rnd.NextSingle() * width,
-                Y0 = rnd.NextSingle() * height,
-                X1 = rnd.NextSingle() * width,
-                Y1 = rnd.NextSingle() * height,
-                Thickness = 1,
-                Color = 0xFF000000 | (uint)rnd.Next()
-            };
-        
-            api.DrawLine(line);
-        }
+        Update?.Invoke(api, (float)deltaTime.TotalSeconds);
 
         api.EndFrame();
+    }
+
+    protected override HandleRef BuildWindowCore(HandleRef hWndParent)
+    {
+        var handle = Win32.CreateWindowEx(0,
+            "static",
+            "",
+            Win32.WS_VISIBLE | Win32.WS_CHILD,
+            0,
+            0,
+            200,
+            200,
+            hWndParent.Handle,
+            IntPtr.Zero,
+            IntPtr.Zero,
+            IntPtr.Zero);
+
+        api = new(handle);
+        CompositionTarget.Rendering += OnRender;
+
+        return new(this, handle);
+    }
+
+    protected override void DestroyWindowCore(HandleRef hwnd)
+    {
+        CompositionTarget.Rendering -= OnRender;
+        Win32.DestroyWindow(hwnd.Handle);
     }
 
     protected override void Dispose(bool disposing)
@@ -82,10 +83,6 @@ public sealed class ImmediateControl : HwndWrapper
     protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
     {
         base.OnRenderSizeChanged(sizeInfo);
-
-        if (api.IsInitialized)
-        {
-            api.Resize((int)sizeInfo.NewSize.Width, (int)sizeInfo.NewSize.Height);
-        }
+        api.Resize((int)sizeInfo.NewSize.Width, (int)sizeInfo.NewSize.Height);
     }
 }

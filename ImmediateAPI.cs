@@ -1,5 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using TestInteropWpf.Data;
+using TestInteropWpf.Shapes;
 
 namespace TestInteropWpf;
 
@@ -14,9 +14,9 @@ public readonly partial struct ImmediateAPI : IDisposable
         handle = API.Init(hWnd);
     }
 
-    public void BeginFrame()
+    public void BeginFrame(Color color)
     {
-        API.BeginFrame(handle);
+        API.BeginFrame(handle, color);
     }
 
     public void EndFrame()
@@ -33,7 +33,7 @@ public readonly partial struct ImmediateAPI : IDisposable
     {
         API.DrawCircle(handle, circle);
     }
-    
+
     public void DrawLine(Line line)
     {
         API.DrawLine(handle, line);
@@ -50,7 +50,7 @@ public readonly partial struct ImmediateAPI : IDisposable
         public static partial IntPtr Init(IntPtr hWnd);
 
         [LibraryImport("ImmediateRendering.dll")]
-        public static partial void BeginFrame(IntPtr handle);
+        public static partial void BeginFrame(IntPtr handle, Color color);
 
         [LibraryImport("ImmediateRendering.dll")]
         public static partial void EndFrame(IntPtr handle);
@@ -63,7 +63,7 @@ public readonly partial struct ImmediateAPI : IDisposable
 
         [LibraryImport("ImmediateRendering.dll")]
         public static partial void DrawCircle(IntPtr handle, Circle circle);
-        
+
         [LibraryImport("ImmediateRendering.dll")]
         public static partial void DrawLine(IntPtr handle, Line line);
     }
