@@ -12,7 +12,9 @@ namespace TestInteropWpf
             InitializeComponent();
 
             var control = new ImmediateControl();
-            control.Width = 600;
+            control.Update += dt => FPS.Content = (1 / dt).ToString("F2");
+
+            control.Width = 900;
             Root.Children.Add(control);
         }
     }
